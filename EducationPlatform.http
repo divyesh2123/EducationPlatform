@@ -1,0 +1,63 @@
+### All requests go through the Ocelot API Gateway
+@gateway = http://localhost:5000
+
+### 1. Create a student  -> publishes StudentCreatedIntegrationEvent
+POST {{gateway}}/api/students
+Content-Type: application/json
+
+{
+  "firstName": "Asha",
+  "lastName": "Patel",
+  "email": "asha.patel@uni.edu",
+  "dateOfBirth": "2002-05-14",
+  "phoneNumber": "9876543210"
+}
+
+### 2. Create a course  -> publishes CourseCreatedIntegrationEvent
+POST {{gateway}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "CS501",
+  "title": "Distributed Systems",
+  "description": "Microservices, messaging and eventual consistency",
+  "instructor": "Dr. Rao",
+  "credits": 4,
+  "capacity": 30,
+  "startDate": "2026-11-01"
+}
+
+### 3. See what Enrollment service received via RabbitMQ (its local read models)
+GET {{gateway}}/api/enrollments/read-models/students
+
+###
+GET {{gateway}}/api/enrollments/read-models/courses
+
+### 4. Enroll  -> publishes StudentEnrolledIntegrationEvent
+POST {{gateway}}/api/enrollments
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1
+}
+
+### 5. Gateway aggregate: student + their enrollments in one call
+GET {{gateway}}/api/dashboard/students/1
+
+### 6. Notifications generated from events
+GET {{gateway}}/api/notifications
+
+###
+GET {{gateway}}/api/notifications/recipient/asha.patel@uni.edu
+
+### 7. Cancel an enrollment  -> publishes EnrollmentCancelledIntegrationEvent
+POST {{gateway}}/api/enrollments/1/cancel
+Content-Type: application/json
+
+{
+  "reason": "Schedule conflict"
+}
+
+### 8. Delete a student -> StudentDeleted -> Enrollment cancels active enrollments -> EnrollmentCancelled -> Notification
+DELETE {{gateway}}/api/students/1

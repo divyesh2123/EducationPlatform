@@ -1,0 +1,16 @@
+# RabbitMQ broker for local development.
+#   AMQP:          localhost:5672
+#   Management UI: http://localhost:15672  (guest / guest)
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: education-rabbitmq
+    hostname: education-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq-data:

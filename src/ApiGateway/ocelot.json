@@ -1,0 +1,95 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/students",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/students",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5101 } ]
+    },
+    {
+      "Key": "student",
+      "UpstreamPathTemplate": "/api/students/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/students/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5101 } ]
+    },
+
+    {
+      "UpstreamPathTemplate": "/api/courses",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/courses",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5102 } ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/courses/{everything}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/courses/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5102 } ]
+    },
+
+    {
+      "UpstreamPathTemplate": "/api/enrollments",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/enrollments",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5103 } ],
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "10s",
+        "PeriodTimespan": 10,
+        "Limit": 20
+      }
+    },
+    {
+      "Key": "student-enrollments",
+      "UpstreamPathTemplate": "/api/enrollments/student/{id}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/enrollments/student/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5103 } ],
+      "Priority": 2
+    },
+    {
+      "UpstreamPathTemplate": "/api/enrollments/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/enrollments/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5103 } ],
+      "Priority": 1
+    },
+
+    {
+      "UpstreamPathTemplate": "/api/notifications",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/notifications",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5104 } ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/notifications/{everything}",
+      "UpstreamHttpMethod": [ "GET", "PUT" ],
+      "DownstreamPathTemplate": "/api/notifications/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5104 } ]
+    }
+  ],
+
+  "Aggregates": [
+    {
+      "UpstreamPathTemplate": "/api/dashboard/students/{id}",
+      "RouteKeys": [ "student", "student-enrollments" ]
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000",
+    "RateLimitOptions": {
+      "QuotaExceededMessage": "Too many requests, please slow down.",
+      "HttpStatusCode": 429
+    }
+  }
+}
